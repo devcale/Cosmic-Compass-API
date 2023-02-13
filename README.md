@@ -12,3 +12,4 @@ Whether you're a seasoned astronomer 🔭 or simply interested in learning more 
 - Focus on accuracy and reliability, providing you with trustworthy information. 💯
 
 So why wait? 🤔 If you're looking for an authoritative and comprehensive source of information about exoplanets, look no further than the Star Information Restful API! 🌟
+
