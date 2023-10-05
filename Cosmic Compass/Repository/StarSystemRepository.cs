@@ -22,11 +22,33 @@ namespace Cosmic_Compass.Repository
             return starSystems;
         }
 
+        public StarSystem Get(string id)
+        {
+            StarSystem starSystem = _provider.Connection.Get<StarSystem>(typeof(StarSystem) + ":" + id);
+
+            return starSystem;
+        }
+
         public string Create(StarSystem starSystem)
         {
             string id = _provider.Connection.Set(starSystem);
 
             return id;
+        }
+
+        public string Update(string id, StarSystem updatedStarSystem)
+        {
+            StarSystem starSystem = Get(id);
+            if (starSystem == null)
+            {
+                throw new Exception("The requested star system does not exist.");
+            }
+            starSystem.Name = updatedStarSystem.Name;
+            starSystem.Stars = updatedStarSystem.Stars;
+            starSystem.Planets = updatedStarSystem.Planets;
+            string updatedId = _provider.Connection.Set(starSystem);
+
+            return updatedId;
         }
     }
 }
