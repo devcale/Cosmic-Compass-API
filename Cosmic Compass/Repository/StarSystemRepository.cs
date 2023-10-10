@@ -50,5 +50,11 @@ namespace Cosmic_Compass.Repository
 
             return updatedId;
         }
+
+        public void Remove(string id)
+        {
+            _provider.Connection.Unlink(typeof(StarSystem) + ":" + id);
+            return;
+        }
     }
 }

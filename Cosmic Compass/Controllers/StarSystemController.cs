@@ -94,5 +94,27 @@ namespace Cosmic_Compass.Controllers
 
             return response;
         }
+
+        /// <summary>
+        /// Endpoint for deleting a star system.
+        /// </summary>
+        /// <remarks>
+        /// This request only receives the id for the star system by url path.
+        /// </remarks>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete("systems/{id}")]
+        public IActionResult DeleteStarSystem(string id)
+        {
+            var starSystem = _repository.Get(id: id);
+            if (starSystem == null)
+            {
+                return NotFound();
+            }
+
+            _repository.Remove(id);
+
+            return NoContent(); 
+        }
     }
 }
