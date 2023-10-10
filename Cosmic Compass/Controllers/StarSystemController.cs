@@ -18,6 +18,31 @@ namespace Cosmic_Compass.Controllers
         }
 
         /// <summary>
+        /// Endpoint for getting a specific star system.
+        /// </summary>
+        /// <remarks>
+        /// This request only receives the id for the star system by url path.
+        /// </remarks>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet(template: "systems/{id}")]
+        public IActionResult GetSystem(string id)
+        {
+            IActionResult response = Ok();
+            StarSystem starSystem = _repository.Get(id: id);
+            if (starSystem == null)
+            {
+                response = NotFound("The requested star system does not exist");
+            }
+            else
+            {
+                response = Ok(starSystem);
+            }
+
+            return response;
+        }
+
+        /// <summary>
         /// Endpoint for listing existing star systems.
         /// </summary>
         /// <returns></returns>

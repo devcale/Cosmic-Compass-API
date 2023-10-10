@@ -14,10 +14,10 @@ namespace Cosmic_Compass.Repository
             _provider.Connection.CreateIndex(typeof(Planet));
         }
 
-        public IRedisCollection<Planet> FindAll()
+        public ICollection<Planet> FindAll(string starSystemId)
         {
-            IRedisCollection<Planet> planets = _provider.RedisCollection<Planet>();
-
+            StarSystem starSystem = _provider.Connection.Get<StarSystem>(typeof(StarSystem) + ":" + starSystemId);
+            ICollection<Planet> planets = starSystem.Planets;
             return planets;
         }
 

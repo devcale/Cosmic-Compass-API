@@ -1,6 +1,8 @@
 ﻿using Cosmic_Compass.Documents;
 using Cosmic_Compass.Repository;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
+using Redis.OM.Searching;
 
 namespace Cosmic_Compass.Controllers
 {
@@ -13,6 +15,24 @@ namespace Cosmic_Compass.Controllers
         {
             _planetRepository = new PlanetRepository();
             _starSystemRepository = new StarSystemRepository();
+        }
+
+        /// <summary>
+        /// Endpoint for listing existing planets on a given star system.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet(template: "systems/{starSystemId}/planets")]
+        public IActionResult ListPlanets(string starSystemId)
+        {
+            JArray planetsInJson = new JArray();
+            ICollection<Planet> planets = _planetRepository.FindAll(starSystemId);
+            foreach (Planet planet in planets)
+            {
+                JObject jPlanet = new JObject(new JProperty("PlanetId", planet.PlanetId.ToString()), new JProperty("StarSystemId", planet.StarSystemId.ToString()), new JProperty("Name", planet.Name.ToString()), new JProperty("Type", planet.Type.ToString()), new JProperty("Radius", planet.Radius), new JProperty("DistanceFromStar", planet.DistanceFromStar), new JProperty("Habitable", planet.Habitable));
+                planetsInJson.Add(jPlanet);
+            }
+
+            return Ok(planetsInJson.ToString());
         }
 
         /// <summary>
