@@ -25,15 +25,58 @@ namespace Cosmic_Compass.Controllers
         public IActionResult ListPlanets(string starSystemId)
         {
             JArray planetsInJson = new JArray();
-            ICollection<Planet> planets = _planetRepository.FindAll(starSystemId);
-            foreach (Planet planet in planets)
+            IActionResult response = Ok();
+            try
             {
-                JObject jPlanet = new JObject(new JProperty("PlanetId", planet.PlanetId.ToString()), new JProperty("StarSystemId", planet.StarSystemId.ToString()), new JProperty("Name", planet.Name.ToString()), new JProperty("Type", planet.Type.ToString()), new JProperty("Radius", planet.Radius), new JProperty("DistanceFromStar", planet.DistanceFromStar), new JProperty("Habitable", planet.Habitable));
-                planetsInJson.Add(jPlanet);
+                ICollection<Planet> planets = _planetRepository.FindAll(starSystemId);
+                foreach (Planet planet in planets)
+                {
+                    JObject jPlanet = new JObject(new JProperty("PlanetId", planet.PlanetId.ToString()), new JProperty("StarSystemId", planet.StarSystemId.ToString()), new JProperty("Name", planet.Name.ToString()), new JProperty("Type", planet.Type.ToString()), new JProperty("Radius", planet.Radius), new JProperty("DistanceFromStar", planet.DistanceFromStar), new JProperty("Habitable", planet.Habitable));
+                    planetsInJson.Add(jPlanet);
+                }
+
+                return Ok(planetsInJson.ToString());
+            } catch(Exception ex)
+            {
+                response = BadRequest(ex.Message);
+            }
+            return response;
+            
+        }
+
+        /// <summary>
+        /// Endpoint for getting a specific planet from a star system.
+        /// </summary>
+        /// <remarks>
+        /// This request receives the id for the star system as well as the id for the planet by url path.
+        /// </remarks>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet(template: "systems/{systemId}/planets/{planetId}")]
+        public IActionResult GetSystem(string systemId, string planetId)
+        {
+            IActionResult response = Ok();
+            try
+            {
+                Planet? planet = _planetRepository.Get(systemId, planetId);
+                if (planet == null)
+                {
+                    response = NotFound("The requested planet does not exist on the requested star system");
+                }
+                else
+                {
+                    response = Ok(planet);
+                }
+            }
+            catch(Exception ex) {
+                response = BadRequest(ex.Message);
+
             }
 
-            return Ok(planetsInJson.ToString());
+
+            return response;
         }
+
 
         /// <summary>
         /// Endpoint for creating a new Planet and adding it to a star system.
