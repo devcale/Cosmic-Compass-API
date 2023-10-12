@@ -43,8 +43,8 @@ namespace Cosmic_Compass.Controllers
             star.StarSystemId = starSystemId;
             string id = _starRepository.Create(star: star);
             starSystem.Stars.Add(star);
-            string updatedStarSystemId = _starSystemRepository.Update(id: starSystemId, updatedStarSystem: starSystem);
-            response = Ok("The star [" + star.StarId + ": " + star.Name + "] has been added successfully to the star system [" + updatedStarSystemId + ": " + starSystem.Name + "].");
+            _starSystemRepository.Update(id: starSystemId, updatedStarSystem: starSystem);
+            response = Ok("The star [" + star.StarId + ": " + star.Name + "] has been added successfully to the star system [" + starSystemId + ": " + starSystem.Name + "].");
 
             return response;
         }

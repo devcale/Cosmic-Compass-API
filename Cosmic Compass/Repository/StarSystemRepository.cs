@@ -36,19 +36,10 @@ namespace Cosmic_Compass.Repository
             return id;
         }
 
-        public string Update(string id, StarSystem updatedStarSystem)
+        public void Update(string id, StarSystem updatedStarSystem)
         {
-            StarSystem starSystem = Get(id);
-            if (starSystem == null)
-            {
-                throw new Exception("The requested star system does not exist.");
-            }
-            starSystem.Name = updatedStarSystem.Name;
-            starSystem.Stars = updatedStarSystem.Stars;
-            starSystem.Planets = updatedStarSystem.Planets;
-            string updatedId = _provider.Connection.Set(starSystem);
+            _provider.Connection.Set(updatedStarSystem);
 
-            return updatedId;
         }
 
         public void Remove(string id)

@@ -3,6 +3,7 @@ using Cosmic_Compass.Repository;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using Redis.OM.Searching;
+using System.Numerics;
 
 namespace Cosmic_Compass.Controllers
 {
@@ -36,12 +37,12 @@ namespace Cosmic_Compass.Controllers
                 }
 
                 return Ok(planetsInJson.ToString());
-            } catch(Exception ex)
+            } catch (Exception ex)
             {
                 response = BadRequest(ex.Message);
             }
             return response;
-            
+
         }
 
         /// <summary>
@@ -50,7 +51,8 @@ namespace Cosmic_Compass.Controllers
         /// <remarks>
         /// This request receives the id for the star system as well as the id for the planet by url path.
         /// </remarks>
-        /// <param name="id"></param>
+        /// <param name="systemId"></param>
+        /// <param name="planetId"></param>
         /// <returns></returns>
         [HttpGet(template: "systems/{systemId}/planets/{planetId}")]
         public IActionResult GetSystem(string systemId, string planetId)
@@ -68,7 +70,7 @@ namespace Cosmic_Compass.Controllers
                     response = Ok(planet);
                 }
             }
-            catch(Exception ex) {
+            catch (Exception ex) {
                 response = BadRequest(ex.Message);
 
             }
@@ -105,8 +107,59 @@ namespace Cosmic_Compass.Controllers
 
             string id = _planetRepository.Create(planet: planet);
             starSystem.Planets.Add(planet);
-            string updatedStarSystemId = _starSystemRepository.Update(id: starSystemId, updatedStarSystem: starSystem);
+            _starSystemRepository.Update(id: starSystemId, updatedStarSystem: starSystem);
             response = Ok("The planet [" + planet.PlanetId + ": " + planet.Name + "]  has been added successfully to the star system [" + starSystem.StarSystemId + ": " + starSystem.Name + "].");
+
+            return response;
+        }
+
+        /// <summary>
+        /// Endpoint for updating the info on a planet from a star system.
+        /// </summary>
+        /// <remarks>
+        /// This request receives the id for the star system and the id for the planet by url path.
+        /// </remarks>
+        /// <param name="starSystemId"></param>
+        /// <param name="planetId"></param>
+        /// <returns></returns>
+        [HttpPut(template: "systems/{starSystemId}/planets/{planetId}")]
+        public IActionResult UpdatePlanet([FromRoute] string starSystemId, [FromRoute] string planetId, [FromBody] Planet updatedPlanet)
+        {
+            IActionResult response = Ok();
+            StarSystem starSystem = _starSystemRepository.Get(starSystemId);
+            Planet? planet = _planetRepository.Get(starSystemId, planetId);
+            if (planet == null)
+            {
+                response = NotFound("The requested planet does not exist");
+            }
+            else if (planet.StarSystemId != starSystemId)
+            {
+                response = BadRequest("The requested planet is not part of the requested star system.");
+            }
+            else
+            {                
+                foreach( Planet p in starSystem.Planets )
+                {
+                    if(p.PlanetId.ToString() == planetId)
+                    {
+                        p.Name = updatedPlanet.Name != "" ? updatedPlanet.Name : p.Name;
+                        p.Type = updatedPlanet.Type != Enums.PlanetType.Unknown ? updatedPlanet.Type : p.Type;
+                        p.Radius = updatedPlanet.Radius > 0 ? updatedPlanet.Radius : p.Radius;
+                        p.DistanceFromStar= updatedPlanet.DistanceFromStar > 0 ? updatedPlanet.DistanceFromStar : p.DistanceFromStar;
+                        p.Habitable= updatedPlanet.Habitable;
+                    }    
+                }
+                try
+                {
+                    _starSystemRepository.Update(id: starSystemId, updatedStarSystem: starSystem);
+                    response = Ok("The planet " + planetId + " has been updated successfully.");
+                }
+                catch (Exception ex)
+                {
+                    response = BadRequest(ex.Message);
+                }
+
+            }
 
             return response;
         }

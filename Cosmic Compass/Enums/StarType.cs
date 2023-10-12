@@ -2,10 +2,10 @@
 {
     public enum StarType
     {
+        Unknown,
         RedDwarf,
         YellowDwarf,
         RedGiant,
-        BlueGiant,
-        Unknown
+        BlueGiant
     }
 }

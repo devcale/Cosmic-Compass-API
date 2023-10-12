@@ -93,25 +93,25 @@ namespace Cosmic_Compass.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpPut(template: "systems/{id}")]
-        public IActionResult UpdateSystem(string id, StarSystem updatedStarSystem)
+        public IActionResult UpdateSystem(string id, StarSystem updateValues)
         {
             IActionResult response = Ok();
             string updateId = "";
-            StarSystem existingStarSystem = _repository.Get(id: id);
-            if (existingStarSystem == null)
+            StarSystem starSystem = _repository.Get(id: id);
+            if (starSystem == null)
             {
                 response = NotFound("The requested star system does not exist");
             }
             else
             {
-                if(updatedStarSystem.Stars.Count() > 0)
+                if(updateValues.Stars.Count() > 0)
                 {
                     response = BadRequest("To update the star collection of the system, please refer to each star individually.");
                 }
                 else
                 {
-                    existingStarSystem.Name = updatedStarSystem.Name;
-                    updateId = _repository.Update(id: id, updatedStarSystem: existingStarSystem);
+                    starSystem.Name = updateValues.Name != null ? updateValues.Name : starSystem.Name;  
+                    _repository.Update(id: id, updatedStarSystem: starSystem);
                     response = Ok("The star system " + id + " has been updated successfully.");
                 }
                 

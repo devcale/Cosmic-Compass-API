@@ -2,9 +2,10 @@
 {
     public enum PlanetType
     {
+        Unknown,
         Rocky,
         GasGiant,
-        IceGiant,
-        Unknown
+        IceGiant
+        
     }
 }

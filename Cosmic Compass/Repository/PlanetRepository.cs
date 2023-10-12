@@ -29,16 +29,16 @@ namespace Cosmic_Compass.Repository
         public Planet? Get(string starSystemId, string planetId)
         {
             Planet? planet = _provider.Connection.Get<Planet>(typeof(Planet) + ":" + planetId);
-            if(planet != null)
+            if(planet == null)
             {
-                if(planet.StarSystemId != starSystemId)
-                {
-                    throw new Exception("The requested planet is not part of the requested star system.");
-                }
+                throw new Exception("The requested planet does not exist"); 
             }
             else
             {
-                throw new Exception("The requested planet does not exist");
+                if (planet.StarSystemId != starSystemId)
+                {
+                    throw new Exception("The requested planet is not part of the requested star system.");
+                }
             }
             return planet;
         }
@@ -48,6 +48,13 @@ namespace Cosmic_Compass.Repository
             string id = _provider.Connection.Set(planet);
 
             return id;
+        }
+
+        public string Update(string starSystemId, string planetId, Planet updatedPlanet)
+        {
+            
+            string updatedId = _provider.Connection.Set(updatedPlanet);
+            return updatedId;
         }
     }
 }
