@@ -52,7 +52,6 @@ namespace Cosmic_Compass.Repository
 
         public string Update(string starSystemId, string planetId, Planet updatedPlanet)
         {
-            
             string updatedId = _provider.Connection.Set(updatedPlanet);
             return updatedId;
         }

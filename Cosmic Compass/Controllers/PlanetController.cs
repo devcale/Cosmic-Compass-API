@@ -163,5 +163,53 @@ namespace Cosmic_Compass.Controllers
 
             return response;
         }
+
+        /// <summary>
+        /// Endpoint for deleting a planet from a star system.
+        /// </summary>
+        /// <remarks>
+        /// This request receives both the id for the star system and the planet by url path.
+        /// </remarks>
+        /// <param name="system_id"></param>
+        /// <param name="planet_id"></param>
+        /// <returns></returns>
+        [HttpDelete("systems/{system_id}/planets/{planet_id}")]
+        public IActionResult DeletePlanet(string system_id, string planet_id)
+        {
+            IActionResult response = Ok();
+            StarSystem starSystem = _starSystemRepository.Get(system_id);
+            Planet? planet = _planetRepository.Get(system_id, planet_id);
+            if (planet == null)
+            {
+                response = NotFound("The requested planet does not exist");
+            }
+            else if (planet.StarSystemId != system_id)
+            {
+                response = BadRequest("The requested planet is not part of the requested star system.");
+            }
+            else
+            {
+                Planet requested = null;
+                foreach( Planet p in starSystem.Planets )
+                {
+                    if(p.PlanetId.ToString() == planet_id)
+                    {
+                        requested = p; break;
+                    }    
+                }
+                starSystem.Planets.Remove(requested);
+                try
+                {
+                    _starSystemRepository.Update(id: system_id, updatedStarSystem: starSystem);
+                    response = Ok("The planet " + planet_id + " has been removed successfully.");
+                }
+                catch (Exception ex)
+                {
+                    response = BadRequest(ex.Message);
+                }
+            }
+
+            return NoContent();
+        }
     }
 }
