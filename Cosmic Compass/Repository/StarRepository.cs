@@ -27,14 +27,20 @@ namespace Cosmic_Compass.Repository
             return stars;
         }
 
-        public Star Get(string id)
+        public Star? Get(string starSystemId, string starId)
         {
-            Star star = _provider.Connection.Get<Star>(typeof(Star) + ":" + id);
+            Star? star = _provider.Connection.Get<Star>(typeof(Star) + ":" + starId);
             if (star == null)
             {
-                throw new Exception("The requested star doesnt exist.");
+                throw new Exception("The requested star does not exist");
             }
-
+            else
+            {
+                if (star.StarSystemId != starSystemId)
+                {
+                    throw new Exception("The requested star is not part of the requested star system.");
+                }
+            }
             return star;
         }
 

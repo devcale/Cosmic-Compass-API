@@ -79,6 +79,41 @@ namespace Cosmic_Compass.Controllers
 
         }
 
+        /// <summary>
+        /// Endpoint for getting a specific star from a star system.
+        /// </summary>
+        /// <remarks>
+        /// This request receives the id for the star system as well as the id for the star by url path.
+        /// </remarks>
+        /// <param name="systemId"></param>
+        /// <param name="starId"></param>
+        /// <returns></returns>
+        [HttpGet(template: "systems/{systemId}/stars/{starId}")]
+        public IActionResult GetStar(string systemId, string starId)
+        {
+            IActionResult response = Ok();
+            try
+            {
+                Star? star = _starRepository.Get(systemId, starId);
+                if (star == null)
+                {
+                    response = NotFound("The requested star does not exist on the requested star system");
+                }
+                else
+                {
+                    response = Ok(star);
+                }
+            }
+            catch (Exception ex)
+            {
+                response = BadRequest(ex.Message);
+
+            }
+
+
+            return response;
+        }
+
 
     }
 }

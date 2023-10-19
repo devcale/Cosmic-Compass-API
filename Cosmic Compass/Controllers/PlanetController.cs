@@ -55,7 +55,7 @@ namespace Cosmic_Compass.Controllers
         /// <param name="planetId"></param>
         /// <returns></returns>
         [HttpGet(template: "systems/{systemId}/planets/{planetId}")]
-        public IActionResult GetSystem(string systemId, string planetId)
+        public IActionResult GetPlanet(string systemId, string planetId)
         {
             IActionResult response = Ok();
             try
