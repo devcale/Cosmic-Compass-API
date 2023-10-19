@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Cosmic_Compass.Documents;
 using Cosmic_Compass.Repository;
-using System.Numerics;
+using Newtonsoft.Json.Linq;
+using System.Diagnostics;
 
 namespace Cosmic_Compass.Controllers
 {
@@ -49,6 +50,165 @@ namespace Cosmic_Compass.Controllers
             return response;
         }
 
-        
+
+        /// <summary>
+        /// Endpoint for listing existing stars on a given star system.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet(template: "systems/{starSystemId}/stars")]
+        public IActionResult ListStars(string starSystemId)
+        {
+            JArray starsInJson = new JArray();
+            IActionResult response = Ok();
+            try
+            {
+                ICollection<Star> stars = _starRepository.FindAll(starSystemId);
+                foreach (Star star in stars)
+                {
+                    JObject jstar = new JObject(new JProperty("starId", star.StarId.ToString()), new JProperty("StarSystemId", star.StarSystemId.ToString()), new JProperty("Name", star.Name.ToString()), new JProperty("Type", star.Type.ToString()), new JProperty("Mass", star.Mass));
+                    starsInJson.Add(jstar);
+                }
+
+                return Ok(starsInJson.ToString());
+            }
+            catch (Exception ex)
+            {
+                response = BadRequest(ex.Message);
+            }
+            return response;
+
+        }
+
+        /// <summary>
+        /// Endpoint for getting a specific star from a star system.
+        /// </summary>
+        /// <remarks>
+        /// This request receives the id for the star system as well as the id for the star by url path.
+        /// </remarks>
+        /// <param name="systemId"></param>
+        /// <param name="starId"></param>
+        /// <returns></returns>
+        [HttpGet(template: "systems/{systemId}/stars/{starId}")]
+        public IActionResult GetStar(string systemId, string starId)
+        {
+            IActionResult response = Ok();
+            try
+            {
+                Star? star = _starRepository.Get(systemId, starId);
+                if (star == null)
+                {
+                    response = NotFound("The requested star does not exist on the requested star system");
+                }
+                else
+                {
+                    response = Ok(star);
+                }
+            }
+            catch (Exception ex)
+            {
+                response = BadRequest(ex.Message);
+
+            }
+
+
+            return response;
+        }
+
+        /// <summary>
+        /// Endpoint for updating the info on a star from a star system.
+        /// </summary>
+        /// <remarks>
+        /// This request receives the id for the star system and the id for the star by url path.
+        /// </remarks>
+        /// <param name="starSystemId"></param>
+        /// <param name="starId"></param>
+        /// <returns></returns>
+        [HttpPut(template: "systems/{starSystemId}/stars/{starId}")]
+        public IActionResult UpdateStar([FromRoute] string starSystemId, [FromRoute] string starId, [FromBody] Star updatedStar)
+        {
+            IActionResult response = Ok();
+            StarSystem starSystem = _starSystemRepository.Get(starSystemId);
+            Star? star = _starRepository.Get(starSystemId, starId);
+            if (star == null)
+            {
+                response = NotFound("The requested star does not exist");
+            }
+            else if (star.StarSystemId != starSystemId)
+            {
+                response = BadRequest("The requested star is not part of the requested star system.");
+            }
+            else
+            {
+                foreach (Star p in starSystem.Stars)
+                {
+                    if (p.StarId.ToString() == starId)
+                    {
+                        p.Name = updatedStar.Name != "" ? updatedStar.Name : p.Name;
+                        p.Type = updatedStar.Type != Enums.StarType.Unknown ? updatedStar.Type : p.Type;
+                        p.Mass = updatedStar.Mass > 0 ? updatedStar.Mass : p.Mass;
+                    }
+                }
+                try
+                {
+                    _starSystemRepository.Update(id: starSystemId, updatedStarSystem: starSystem);
+                    response = Ok("The star " + starId + " has been updated successfully.");
+                }
+                catch (Exception ex)
+                {
+                    response = BadRequest(ex.Message);
+                }
+
+            }
+
+            return response;
+        }
+
+        /// <summary>
+        /// Endpoint for deleting a star from a star system.
+        /// </summary>
+        /// <remarks>
+        /// This request receives both the id for the star system and the star by url path.
+        /// </remarks>
+        /// <param name="system_id"></param>
+        /// <param name="star_id"></param>
+        /// <returns></returns>
+        [HttpDelete("systems/{system_id}/stars/{star_id}")]
+        public IActionResult DeleteStar(string system_id, string star_id)
+        {
+            IActionResult response = NoContent();
+            StarSystem starSystem = _starSystemRepository.Get(system_id);
+            Star? star = _starRepository.Get(system_id, star_id);
+            if (star == null)
+            {
+                response = NotFound("The requested star does not exist");
+            }
+            else if (star.StarSystemId != system_id)
+            {
+                response = BadRequest("The requested star is not part of the requested star system.");
+            }
+            else
+            {
+                Star requested = null;
+                foreach (Star p in starSystem.Stars)
+                {
+                    if (p.StarId.ToString() == star_id)
+                    {
+                        requested = p; break;
+                    }
+                }
+                starSystem.Stars.Remove(requested);
+                try
+                {
+                    _starSystemRepository.Update(id: system_id, updatedStarSystem: starSystem);
+                }
+                catch (Exception ex)
+                {
+                    response = BadRequest(ex.Message);
+                }
+            }
+
+            return response;
+        }
+
     }
 }
