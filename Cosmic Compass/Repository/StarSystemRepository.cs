@@ -22,11 +22,30 @@ namespace Cosmic_Compass.Repository
             return starSystems;
         }
 
+        public StarSystem Get(string id)
+        {
+            StarSystem starSystem = _provider.Connection.Get<StarSystem>(typeof(StarSystem) + ":" + id);
+
+            return starSystem;
+        }
+
         public string Create(StarSystem starSystem)
         {
             string id = _provider.Connection.Set(starSystem);
 
             return id;
+        }
+
+        public void Update(string id, StarSystem updatedStarSystem)
+        {
+            _provider.Connection.Set(updatedStarSystem);
+
+        }
+
+        public void Remove(string id)
+        {
+            _provider.Connection.Unlink(typeof(StarSystem) + ":" + id);
+            return;
         }
     }
 }
