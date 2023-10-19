@@ -18,6 +18,30 @@ namespace Cosmic_Compass.Controllers
         }
 
         /// <summary>
+        /// Endpoint for system creation. 
+        /// </summary>
+        /// <remarks>
+        /// Request should be equivalent to:
+        /// 
+        ///     POST /systems
+        ///     {
+        ///        "Stars": [],
+        ///        "Planets": []
+        ///     }
+        ///     
+        /// All information is set by default.
+        /// </remarks>
+        /// <param name="starSystem"></param>
+        /// <returns>The ID of the created system.</returns>
+        [HttpPost(template: "systems")]
+        public IActionResult CreateSystem(StarSystem starSystem)
+        {
+            string id = _repository.Create(starSystem);
+
+            return Ok(id);
+        }
+
+        /// <summary>
         /// Endpoint for getting a specific star system.
         /// </summary>
         /// <remarks>
@@ -60,29 +84,7 @@ namespace Cosmic_Compass.Controllers
             return Ok(starSystemsInJson.ToString());
         }
 
-        /// <summary>
-        /// Endpoint for system creation. 
-        /// </summary>
-        /// <remarks>
-        /// Request should be equivalent to:
-        /// 
-        ///     POST /systems
-        ///     {
-        ///        "Stars": [],
-        ///        "Planets": []
-        ///     }
-        ///     
-        /// All information is set by default.
-        /// </remarks>
-        /// <param name="starSystem"></param>
-        /// <returns>The ID of the created system.</returns>
-        [HttpPost(template: "systems")]
-        public IActionResult CreateSystem(StarSystem starSystem)
-        {
-            string id = _repository.Create(starSystem);
-
-            return Ok(id);
-        }
+        
 
         /// <summary>
         /// Endpoint for updating the info on a star system.
