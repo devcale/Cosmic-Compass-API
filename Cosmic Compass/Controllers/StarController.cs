@@ -163,5 +163,52 @@ namespace Cosmic_Compass.Controllers
             return response;
         }
 
+        /// <summary>
+        /// Endpoint for deleting a star from a star system.
+        /// </summary>
+        /// <remarks>
+        /// This request receives both the id for the star system and the star by url path.
+        /// </remarks>
+        /// <param name="system_id"></param>
+        /// <param name="star_id"></param>
+        /// <returns></returns>
+        [HttpDelete("systems/{system_id}/stars/{star_id}")]
+        public IActionResult DeleteStar(string system_id, string star_id)
+        {
+            IActionResult response = NoContent();
+            StarSystem starSystem = _starSystemRepository.Get(system_id);
+            Star? star = _starRepository.Get(system_id, star_id);
+            if (star == null)
+            {
+                response = NotFound("The requested star does not exist");
+            }
+            else if (star.StarSystemId != system_id)
+            {
+                response = BadRequest("The requested star is not part of the requested star system.");
+            }
+            else
+            {
+                Star requested = null;
+                foreach (Star p in starSystem.Stars)
+                {
+                    if (p.StarId.ToString() == star_id)
+                    {
+                        requested = p; break;
+                    }
+                }
+                starSystem.Stars.Remove(requested);
+                try
+                {
+                    _starSystemRepository.Update(id: system_id, updatedStarSystem: starSystem);
+                }
+                catch (Exception ex)
+                {
+                    response = BadRequest(ex.Message);
+                }
+            }
+
+            return response;
+        }
+
     }
 }
