@@ -15,10 +15,15 @@ namespace Cosmic_Compass.Repository
             _provider.Connection.CreateIndex(typeof(Star));
         }
 
-        public IRedisCollection<Star> FindAll()
+        public ICollection<Star> FindAll(string starSystemId)
         {
-            IRedisCollection<Star> stars = _provider.RedisCollection<Star>();
-
+            StarSystem? starSystem = _provider.Connection.Get<StarSystem>(typeof(StarSystem) + ":" + starSystemId);
+            ICollection<Star>? stars = null;
+            if (starSystem == null)
+            {
+                throw new Exception("The requested star system does not exist");
+            }
+            stars = starSystem.Stars;
             return stars;
         }
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Cosmic_Compass.Documents;
 using Cosmic_Compass.Repository;
+using Newtonsoft.Json.Linq;
 using System.Numerics;
 
 namespace Cosmic_Compass.Controllers
@@ -49,6 +50,35 @@ namespace Cosmic_Compass.Controllers
             return response;
         }
 
-        
+
+        /// <summary>
+        /// Endpoint for listing existing stars on a given star system.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet(template: "systems/{starSystemId}/stars")]
+        public IActionResult ListStars(string starSystemId)
+        {
+            JArray starsInJson = new JArray();
+            IActionResult response = Ok();
+            try
+            {
+                ICollection<Star> stars = _starRepository.FindAll(starSystemId);
+                foreach (Star star in stars)
+                {
+                    JObject jstar = new JObject(new JProperty("starId", star.StarId.ToString()), new JProperty("StarSystemId", star.StarSystemId.ToString()), new JProperty("Name", star.Name.ToString()), new JProperty("Type", star.Type.ToString()), new JProperty("Mass", star.Mass));
+                    starsInJson.Add(jstar);
+                }
+
+                return Ok(starsInJson.ToString());
+            }
+            catch (Exception ex)
+            {
+                response = BadRequest(ex.Message);
+            }
+            return response;
+
+        }
+
+
     }
 }
