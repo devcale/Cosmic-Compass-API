@@ -49,6 +49,12 @@ namespace Cosmic_Compass.Repository
             string id = _provider.Connection.Set(star);
 
             return id;
-        }   
+        }
+
+        public string Update(string starSystemId, string starId, Star updatedStar)
+        {
+            string updatedId = _provider.Connection.Set(updatedStar);
+            return updatedId;
+        }
     }
 }
