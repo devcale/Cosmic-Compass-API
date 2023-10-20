@@ -15,19 +15,31 @@ namespace Cosmic_Compass.Repository
             _provider.Connection.CreateIndex(typeof(Star));
         }
 
-        public IRedisCollection<Star> FindAll()
+        public ICollection<Star> FindAll(string starSystemId)
         {
-            IRedisCollection<Star> stars = _provider.RedisCollection<Star>();
-
+            StarSystem? starSystem = _provider.Connection.Get<StarSystem>(typeof(StarSystem) + ":" + starSystemId);
+            ICollection<Star>? stars = null;
+            if (starSystem == null)
+            {
+                throw new Exception("The requested star system does not exist");
+            }
+            stars = starSystem.Stars;
             return stars;
         }
 
-        public Star Get(string id)
+        public Star? Get(string starSystemId, string starId)
         {
-            Star star = _provider.Connection.Get<Star>(typeof(Star) + ":" + id);
+            Star? star = _provider.Connection.Get<Star>(typeof(Star) + ":" + starId);
             if (star == null)
             {
-                throw new Exception("The requested star doesnt exist.");
+                throw new Exception("The requested star does not exist");
+            }
+            else
+            {
+                if (star.StarSystemId != starSystemId)
+                {
+                    throw new Exception("The requested star is not part of the requested star system.");
+                }
             }
 
             return star;
@@ -38,6 +50,13 @@ namespace Cosmic_Compass.Repository
             string id = _provider.Connection.Set(star);
 
             return id;
-        }   
+        }
+
+        public string Update(string starSystemId, string starId, Star updatedStar)
+        {
+            string updatedId = _provider.Connection.Set(updatedStar);
+            return updatedId;
+        }
+
     }
 }

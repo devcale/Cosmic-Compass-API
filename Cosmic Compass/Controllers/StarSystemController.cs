@@ -18,6 +18,30 @@ namespace Cosmic_Compass.Controllers
         }
 
         /// <summary>
+        /// Endpoint for system creation. 
+        /// </summary>
+        /// <remarks>
+        /// Request should be equivalent to:
+        /// 
+        ///     POST /systems
+        ///     {
+        ///        "Stars": [],
+        ///        "Planets": []
+        ///     }
+        ///     
+        /// All information is set by default.
+        /// </remarks>
+        /// <param name="starSystem"></param>
+        /// <returns>The ID of the created system.</returns>
+        [HttpPost(template: "systems")]
+        public IActionResult CreateSystem(StarSystem starSystem)
+        {
+            string id = _repository.Create(starSystem);
+
+            return Ok(id);
+        }
+
+        /// <summary>
         /// Endpoint for getting a specific star system.
         /// </summary>
         /// <remarks>
@@ -60,28 +84,64 @@ namespace Cosmic_Compass.Controllers
             return Ok(starSystemsInJson.ToString());
         }
 
+        
+
         /// <summary>
-        /// Endpoint for system creation. 
+        /// Endpoint for updating the info on a star system.
         /// </summary>
         /// <remarks>
-        /// Request should be equivalent to:
-        /// 
-        ///     POST /systems
-        ///     {
-        ///        "Stars": [],
-        ///        "Planets": []
-        ///     }
-        ///     
-        /// All information is set by default.
+        /// This request only receives the id for the star system by url path.
         /// </remarks>
-        /// <param name="starSystem"></param>
-        /// <returns>The ID of the created system.</returns>
-        [HttpPost(template: "systems")]
-        public IActionResult CreateSystem(StarSystem starSystem)
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPut(template: "systems/{id}")]
+        public IActionResult UpdateSystem(string id, StarSystem updateValues)
         {
-            string id = _repository.Create(starSystem);
+            IActionResult response = Ok();
+            string updateId = "";
+            StarSystem starSystem = _repository.Get(id: id);
+            if (starSystem == null)
+            {
+                response = NotFound("The requested star system does not exist");
+            }
+            else
+            {
+                if(updateValues.Stars.Count() > 0)
+                {
+                    response = BadRequest("To update the star collection of the system, please refer to each star individually.");
+                }
+                else
+                {
+                    starSystem.Name = updateValues.Name != null ? updateValues.Name : starSystem.Name;  
+                    _repository.Update(id: id, updatedStarSystem: starSystem);
+                    response = Ok("The star system " + id + " has been updated successfully.");
+                }
+                
+            }
 
-            return Ok(id);
+            return response;
+        }
+
+        /// <summary>
+        /// Endpoint for deleting a star system.
+        /// </summary>
+        /// <remarks>
+        /// This request only receives the id for the star system by url path.
+        /// </remarks>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete("systems/{id}")]
+        public IActionResult DeleteStarSystem(string id)
+        {
+            var starSystem = _repository.Get(id: id);
+            if (starSystem == null)
+            {
+                return NotFound();
+            }
+
+            _repository.Remove(id);
+
+            return NoContent(); 
         }
 
         /// <summary>
