@@ -113,8 +113,6 @@ namespace Cosmic_Compass.Controllers
         }
 
 
-        
-
         /// <summary>
         /// Endpoint for updating the info on a planet from a star system.
         /// </summary>

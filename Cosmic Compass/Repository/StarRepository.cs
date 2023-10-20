@@ -41,6 +41,7 @@ namespace Cosmic_Compass.Repository
                     throw new Exception("The requested star is not part of the requested star system.");
                 }
             }
+
             return star;
         }
 
@@ -56,5 +57,6 @@ namespace Cosmic_Compass.Repository
             string updatedId = _provider.Connection.Set(updatedStar);
             return updatedId;
         }
+
     }
 }
