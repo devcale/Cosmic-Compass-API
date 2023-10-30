@@ -11,7 +11,7 @@ namespace Cosmic_Compass.Repository
 
         public StarRepository()
         {
-            _provider = new RedisConnectionProvider("redis://:" + Environment.GetEnvironmentVariable("ASPNETCORE_REDISPASS") + "@redis-13421.c57.us-east-1-4.ec2.cloud.redislabs.com:13421");
+            _provider = new RedisConnectionProvider("redis://:" + Environment.GetEnvironmentVariable("ASPNETCORE_REDISPASS") + "@" + Environment.GetEnvironmentVariable("ASPNETCORE_REDISURL") + ":" + Environment.GetEnvironmentVariable("ASPNETCORE_REDISPORT"));
             _provider.Connection.CreateIndex(typeof(Star));
         }
 

@@ -17,7 +17,9 @@
       "applicationUrl": "https://localhost:7183;http://localhost:5161",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_REDISPASS": "2KLj7QAWBw9RQqmJugKvqKsmol2EWUBl"
+        "ASPNETCORE_REDISPASS": "2KLj7QAWBw9RQqmJugKvqKsmol2EWUBl",
+        "ASPNETCORE_REDISURL": "redis-13421.c57.us-east-1-4.ec2.cloud.redislabs.com",
+        "ASPNETCORE_REDISPORT": "13421"
       }
     },
     "IIS Express": {
