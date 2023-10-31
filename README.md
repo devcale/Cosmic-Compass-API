@@ -164,4 +164,30 @@ Example request:
 
 Example response: 
 `Cosmic_Compass.Documents.StarSystem:01HE1HCQ9NB9AEC0BHZ7Z9R08Z` (The ID of the newly created star system)
+
+#### Update a Star System
+
+Endpoint: `PUT /systems/{system_id}`
+
+Description: This endpoint updates the attributes of an existing star system. This method is only used for the star system attributes, in order to update a star or a planet, please refer to their respective methods.
+
+Example request: 
+```json
+{
+  "name": "Sirius"
+}
+```
+
+Example response: 
+
+The star system `01HE1HCQ9NB9AEC0BHZ7Z9R08Z` has been updated successfully.
+
+
+#### Delete a Star System
+
+Endpoint: `DELETE /systems/{system_id}`
+
+Description: This endpoint deletes an existing star system from the database.
+
+The response for a successful scenario should be 204.
   
